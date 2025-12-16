@@ -52,7 +52,7 @@ This project is optimized for deployment on **Netlify**.
 3.  Add `VITE_API_KEY` in Netlify Site Settings > Environment Variables.
 4.  Deploy!
 
-The project that we deployed: [LegalMitr](legalmitr-2025.netlify.app)
+The project that we deployed: [LegalMitr](https://legalmitr-2025.netlify.app/#/dashboard)
 
 ## ⚠️ Note on Authentication
 This version uses **Mock Authentication** for demonstration purposes. Following is the Authentication defaults used:

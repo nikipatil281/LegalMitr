@@ -5,8 +5,8 @@ import { useNavigate, Link, useParams } from 'react-router-dom';
 import { useDocuments, DocumentSession, useAuth, useLanguage, SubscriptionTier } from '../App';
 import { Upload, Files, TrendingUp, Bookmark, Clock, AlertTriangle, MoreVertical, Trash2, Loader2, CornerUpLeft, FolderOpen, Crown, Zap, Shield, Infinity, Coins } from 'lucide-react';
 
-// New Compact Stat Tile
-const CompactStatTile: React.FC<{ label: string; value: string | number; icon: React.ElementType; color: string; }> = ({ label, value, icon: Icon, color }) => (
+// New Compact Stat Tile (Fixed Types)
+const CompactStatTile: React.FC<{ label: string; value: string | number; icon: any; color: string; }> = ({ label, value, icon: Icon, color }) => (
     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center gap-1 hover:-translate-y-1 transition-transform shadow-sm">
         <Icon className={`h-5 w-5 ${color}`} />
         <span className="text-2xl font-bold text-slate-900 dark:text-white">{value}</span>

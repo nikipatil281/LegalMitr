@@ -406,7 +406,7 @@ DOCUMENT ANALYSIS: ${JSON.stringify(session.analysisResult)}`,
                 model: "text-embedding-004",
                 contents: message,
             });
-            const userVector = embeddingResponse.embeddings?.values || embeddingResponse.embeddings?.[0]?.values;
+            const userVector = (embeddingResponse.embedding?.values || []) as number[];
 
             // 2. Perform Cosine Similarity Search (Client-Side)
             const scoredChunks = legalIndex.map(chunk => ({

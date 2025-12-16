@@ -277,117 +277,82 @@ const availableLanguages: { code: Language; name: string }[] = [
     { code: 'ml', name: 'Malayalam (മലയാളം)' },
 ];
 
+// --- REPLACE THIS SECTION IN App.tsx ---
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string, replacements?: Record<string, string | number>) => string;
+  isTranslating: boolean;
 }
+
+// Helper: Recursive translation using Gemini
+const translateDictionary = async (targetLangCode: string, targetLangName: string): Promise<any> => {
+  console.log(`Starting translation for ${targetLangName}...`);
+  try {
+    const ai = new GoogleGenAI({ apiKey: getApiKey() });
+    // We only translate the English source to save tokens/complexity
+    const sourceData = translationsObj.en; 
+    
+    const prompt = `You are a professional translator for a legal application.
+    Translate the values of the following JSON object into ${targetLangName} (${targetLangCode}).
+    
+    Rules:
+    1. Keep all keys exactly the same.
+    2. Only translate the values.
+    3. Do not translate variable placeholders like {date}, {score}, {folderName}.
+    4. Return ONLY the valid JSON object.
+    
+    Source JSON:
+    ${JSON.stringify(sourceData)}`;
+
+    const result = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: { responseMimeType: "application/json" }
+    });
+
+    const responseText = result.text;
+    if (!responseText) throw new Error("Empty response from AI translation");
+    
+    return JSON.parse(responseText);
+  } catch (error) {
+    console.error("Translation failed:", error);
+    // Return English as fallback if translation crashes
+    return translationsObj.en; 
+  }
+};
+
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>('en');
-  // Initialize with English loaded
-  const [translationsMap, setTranslationsMap] = useState<any>({ en: translations.en });
+  const [translationsMap, setTranslationsMap] = useState<any>({ en: translationsObj.en });
   const [isTranslating, setIsTranslating] = useState(false);
 
-  const translateDictionary = async (targetLang: string, targetLangName: string) => {
-    try {
-        const ai = new GoogleGenAI({ apiKey: getApiKey() });
-        
-        // We only translate the English values
-        const prompt = `You are a translator. Translate the values of the following JSON object into ${targetLangName}. 
-        IMPORTANT:
-        1. Keep the KEYS exactly the same. Do not translate keys.
-        2. Only translate the VALUES.
-        3. Return ONLY valid JSON.
-        
-        JSON to translate:
-        ${JSON.stringify(translations.en)}
-        `;
-
-        const result = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: {
-                parts: [
-                    { text: prompt }
-                ]
-            },
-            config: {
-                responseMimeType: "application/json"
-            }
-        });
-
-        const text = result.text; 
-        
-        if (!text) throw new Error("No translation returned from AI");
-        
-        const parsed = JSON.parse(text);
-        return parsed;
-    } catch (e) {
-        console.error("Translation failed:", e);
-        return translations.en; // Fallback to English on error
-    }
-  };
-
-  const handleSetLanguage = async (lang: Language) => { 
-    if (lang === 'en') {
-        setLanguageState('en');
-        return;
-    }
-
-    if (translationsMap[lang]) {
-        setLanguageState(lang);
-        return;
-    }
-
-    setIsTranslating(true);
-    const langName = availableLanguages.find(l => l.code === lang)?.name || lang;
-    
-    try {
-        const newTranslations = await translateDictionary(lang, langName);
-        setTranslationsMap((prev: any) => ({ ...prev, [lang]: newTranslations }));
-        setLanguageState(lang);
-    } catch (error) {
-        console.error("Failed to switch language", error);
-    } finally {
-        setIsTranslating(false);
-    }
-  };
-
+  // Helper to safely get translations
   const t = useCallback((key: string, replacements?: Record<string, string | number>): string => {
     const keys = key.split('.');
-    
-    // 1. Try to find the text in the CURRENT language
     let result: any = translationsMap[language] || translationsMap['en'];
     
-    // Traverse the object
     for (const k of keys) {
         if (result && typeof result === 'object' && k in result) {
             result = result[k];
         } else {
-            // 2. If missing, reset and fallback to ENGLISH
-             let fallbackResult: any = translations.en;
-             let foundFallback = true;
+             let fallbackResult: any = translationsObj['en'];
             for (const fk of keys) {
                  if (fallbackResult && typeof fallbackResult === 'object' && fk in fallbackResult) {
                     fallbackResult = fallbackResult[fk];
                 } else {
-                    foundFallback = false;
-                    break;
+                    return key; 
                 }
             }
-            if (foundFallback) {
-                result = fallbackResult;
-            } else {
-                result = key; // If even English is missing, show key
-            }
+            result = fallbackResult;
             break;
         }
     }
-    
     let value = typeof result === 'string' ? result : key;
-    
-    if (replacements) {
+     if (replacements) {
         Object.entries(replacements).forEach(([rKey, rValue]) => {
             value = value.replace(`{${rKey}}`, String(rValue));
         });
@@ -395,13 +360,43 @@ const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children })
     return value;
   }, [language, translationsMap]);
 
+  // --- UPDATED LOGIC HERE ---
+  const handleSetLanguage = async (lang: Language) => { 
+      // 1. If switching to English, just do it immediately
+      if (lang === 'en') {
+          setLanguageState('en');
+          return;
+      }
+
+      // 2. If we already have this language in memory, switch immediately
+      if (translationsMap[lang]) {
+          setLanguageState(lang);
+          return;
+      }
+
+      // 3. Otherwise, trigger "Translating..." state and fetch
+      setIsTranslating(true);
+      const langName = availableLanguages.find(l => l.code === lang)?.name || lang;
+      
+      try {
+          const newTranslations = await translateDictionary(lang, langName);
+          setTranslationsMap((prev: any) => ({ ...prev, [lang]: newTranslations }));
+          setLanguageState(lang);
+      } catch (error) {
+          console.error("Failed to switch language", error);
+          // Optional: Add notification here if you want
+      } finally {
+          setIsTranslating(false);
+      }
+  };
+
   const value = useMemo(() => ({ 
-    language, 
-    setLanguage: handleSetLanguage, 
-    t, 
-    isTranslating 
-  }), [language, translationsMap, t, isTranslating]);
-  
+      language, 
+      setLanguage: handleSetLanguage, 
+      t, 
+      isTranslating 
+  }), [language, t, isTranslating]);
+
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 

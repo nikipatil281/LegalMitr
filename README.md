@@ -53,6 +53,6 @@ This project is optimized for deployment on **Netlify**.
 4.  Deploy!
 
 ## ⚠️ Note on Authentication
-This version uses **Mock Authentication** for demonstration purposes. 
+This version uses **Mock Authentication** for demonstration purposes. Following is the Authentication defaults used:
 - **Email**: demo@legalmitr.com
 - **Password**: (Any password works)

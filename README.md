@@ -1,20 +1,58 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# LegalMitr 2025 🇮🇳
 
-# Run and deploy your AI Studio app
+**LegalMitr** is an AI-powered legal assistant tailored for the Indian legal context. It simplifies complex legal documents, identifies risks, and drafts professional legal agreements using Google's Gemini AI.
 
-This contains everything you need to run your app locally.
+## 🚀 Features
 
-View your app in AI Studio: https://ai.studio/apps/drive/1vutxrleUOYEX9JwurFbWpWPj5F75giBv
+* **Document Analysis**: Upload PDFs to get summaries, risk scores, and clause explanations.
+* **Multilingual Support**: Instant translation of the interface and analysis into 8+ Indian languages (Hindi, Marathi, Tamil, etc.).
+* **Legal Document Generator**: Draft contracts and agreements based on simple prompts, with options to redraft specific clauses.
+* **Gap Analysis**: Automatically detects missing critical clauses in contracts.
+* **Mock Lawyer Consultation**: simulates a consultation request flow with fee estimation.
+* **Calendar Integration**: Track legal dates and deadlines.
 
-## Run Locally
+## 🛠 Tech Stack
 
-**Prerequisites:**  Node.js
+* **Frontend**: React (Vite) + TypeScript
+* **Styling**: Tailwind CSS + Lucide Icons
+* **AI Engine**: Google Gemini API (`@google/genai`)
+* **Markdown Rendering**: Marked
+* **State Management**: React Context API
 
+## ⚙️ Setup & Installation
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/nikipatil281/LegalMitr.git
+    cd legalmitr-2025
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Setup**
+    Create a `.env` file in the root directory and add your Google Gemini API Key:
+    ```env
+    VITE_API_KEY=your_google_api_key_here
+    ```
+
+4.  **Run Locally**
+    ```bash
+    npm run dev
+    ```
+
+## 📦 Deployment
+
+This project is optimized for deployment on **Netlify**.
+
+1.  Push code to GitHub.
+2.  Import project to Netlify.
+3.  Add `VITE_API_KEY` in Netlify Site Settings > Environment Variables.
+4.  Deploy!
+
+## ⚠️ Note on Authentication
+This version uses **Mock Authentication** for demonstration purposes. 
+- **Email**: demo@legalmitr.com
+- **Password**: (Any password works)

@@ -88,7 +88,7 @@ const PlanUsageCard: React.FC<{ tier: SubscriptionTier; totalTokens: number }> =
                  )}
                  {tier === 'pro' && (
                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-medium flex items-center gap-1">
-                        <Infinity className="h-3 w-3" /> You have unlimited access.
+                        <InfinityIcon className="h-3 w-3" /> You have unlimited access.
                      </p>
                  )}
              </div>

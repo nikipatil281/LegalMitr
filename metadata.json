@@ -1,0 +1,7 @@
+{
+  "name": "WORKING_LegalMitr_2025",
+  "description": "An AI-powered web application to simplify complex legal documents. Upload a document to get instant summaries, detailed clause explanations, and ask specific questions with an intelligent chatbot.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

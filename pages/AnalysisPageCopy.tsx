@@ -406,8 +406,7 @@ DOCUMENT ANALYSIS: ${JSON.stringify(session.analysisResult)}`,
                 model: "text-embedding-004",
                 contents: message,
             });
-            // FIX: Cast response to any to access 'embedding' property safely
-            const userVector = ((embeddingResponse as any).embedding?.values || []) as number[];
+            const userVector = (embeddingResponse.embedding?.values || []) as number[];
 
             // 2. Perform Cosine Similarity Search (Client-Side)
             const scoredChunks = legalIndex.map(chunk => ({
